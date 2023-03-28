@@ -4,22 +4,38 @@ using Images
 using DataFrames
 using Flux
 using QuartzImageIO
+using PyCall
+using HTTP
+using ImageView
 
-df = CSV.read("labeled_images.txt", DataFrame, header=true)
+function prepare(url)
+    local response = HTTP.get(url)
+    local image_data = response.body
+    local image = load(IOBuffer(image_data))
+    local resized_image = imresize(image, (224, 224))
+    #local flattened_image = channelview(resized_image)
 
-url = df.Images[1]
-#print(url)
-findlast("png", url)
-#print(url[1:113])
-file_path = download(url[1:113], "image.png", headers=Dict("User-Agent"=>"Mozilla/5.0"))
-image1 = load(url[1:113])
-print(image1)
+    println("Finished with image")
 
-for image in df.Images 
-    image = load(image)
-    image = imresize(image, (224, 224))
-    image = channelview(image)
-    image = Flux.preprocess(image)
+    return resized_image
 end
 
-print(df)
+df = CSV.read("labeled_images.txt", DataFrame, header=true)
+#print(df[1, [:Images, :Labels]])
+#print(prepare(df.Images[1]))
+df.PixelVals = [prepare(url) for url in df.Images]
+
+CSV.write("prepared_images.csv", df[:, [:PixelVals, :Labels]])
+
+
+
+# for url in df.Images
+#     local response = HTTP.get(url)
+#     local image_data = response.body
+#     local image = load(IOBuffer(image_data))
+#     local resized_image = imresize(image, (28, 28))
+#     local flattened_image = channelview(resized_image)
+#     url = flattened_image
+# end
+
+#print(prepare(df.Images[1]))
