@@ -21,6 +21,6 @@ end
 
 df = CSV.read("labeled_images.txt", DataFrame, header=true)
 
-df.PixelVals = [prepare(url) for url in df.Images]
+df.PixelVals = [prepare(url) for url in df.urls]
 
 CSV.write("prepared_images.csv", df[:, [:PixelVals, :Labels]])
