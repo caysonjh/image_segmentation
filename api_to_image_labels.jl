@@ -12,39 +12,9 @@ LB_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbGZkaTF0Ynkxc
 lb = labelbox.Client(api_key=LB_API_KEY)
 
 project = lb.get_project('cl97nfdyo0eh5071q5b8l3iom')
-# dataset = next(project.datasets())
-# data_rows = dataset.data_rows()
-# data = []
-
-# for data_row in data_rows:
-#     data_url = data_row.row_data
-#     data.append(data_url)
-
 
 labels = project.label_generator()
 labels = project.export_labels(download = True)
-
-# for label in labels: 
-#     data_url = labels[]
-
-#image = labels[0]["Labeled Data"][:113]
-
-# import os
-# import requests
-# from PIL import Image
-# import io 
-
-# image_arrays = []
-# for index, url in enumerate(data): 
-#     response = requests.get(url)
-#     image_data = response.content
-
-#     image = Image.open(io.BytesIO(image_data))
-#     image.show()
-#     pixels = list(image.getdata())
-#     break
-    
-
 
 with open("labeled_images.txt", 'w') as outfile:
     for label in labels:
