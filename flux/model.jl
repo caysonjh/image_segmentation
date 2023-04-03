@@ -75,6 +75,8 @@ start_time = now()
   display(loss_plot)
 end
 
+@save "flux/models/model_$start_time.jld2" model
+
 end_time = now()
 elapsed_time = end_time - start_time
 elapsed_seconds_total = Dates.value(elapsed_time) ÷ 1000
