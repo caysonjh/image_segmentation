@@ -9,12 +9,12 @@ image_size = 224
 
 X_test = reshape(X_test, image_size, image_size, 1, :)
 
-single = X_test[:, :, 1, 1] #get the first image
+#single = X_test[:, :, 1, 1] #get the first image
 
-single = reshape(test, image_size, image_size, 1, :)
+#single = reshape(single, image_size, image_size, 1, :)
 
 
-y_hat_raw = model(single)
+y_hat_raw = model(X_test)
 
 y_hat = onecold(y_hat_raw) .- 1
 
