@@ -33,15 +33,15 @@ function build_cnn(; imgsize=(image_size, image_size, 1), nclasses=2)
   out_conv_size = (imgsize[1] ÷ 4 - 3, imgsize[2] ÷ 4 - 3, 16)
 
   return Chain(
-      Conv((5, 5), imgsize[end] => 6, relu),
-      MaxPool((2, 2)),
-      Conv((5, 5), 6 => 16, relu),
-      MaxPool((2, 2)),
-      Flux.flatten,
-      Dense(prod(out_conv_size), 120, relu),
-      Dense(120, 84, relu),
-      Dense(84, nclasses),
-      softmax
+    Conv((5, 5), imgsize[end] => 6, relu),
+    MaxPool((2, 2)),
+    Conv((5, 5), 6 => 16, relu),
+    MaxPool((2, 2)),
+    Flux.flatten,
+    Dense(prod(out_conv_size), 120, relu),
+    Dense(120, 84, relu),
+    Dense(84, nclasses),
+    softmax
   )
 end
 
@@ -59,7 +59,7 @@ println("Let the training begin!\n")
 
 #train model
 loss_history = []
-epochs = 100
+epochs = 2
 start_time = now()
 @beep for epoch in 1:epochs
   #train with optimized learning rate
@@ -98,4 +98,4 @@ gr(size=(600, 600))
 p_1_curve = Plots.plot(1:epochs, loss_history, xlabel="Epochs", ylabel="Loss", title="Test Accuracy: $accuracy | Time: $minutes:$seconds | LR: $learning_rate", legend=false, color=:blue, linewidth=2)
 
 savetime = now()
-savefig(p_1_curve, "model_learning_curve_$savetime.png")
+savefig(p_1_curve, "flux/model_graphs/model_learning_curve_$savetime.png")

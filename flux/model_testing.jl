@@ -3,7 +3,7 @@ using Flux: onecold
 
 @load "flux/image_datasets/224-px-50.jld2" X_train X_test y_train y_test
 
-@load "flux/image_datasets/1stCNN.jld2" model
+@load "flux/models/model_2023-04-03T09:47:45.050.jld2" model
 
 image_size = 224
 
