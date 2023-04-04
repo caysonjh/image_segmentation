@@ -1,6 +1,6 @@
 println("Adding packages...\n")
 
-using HTTP, Images, Flux, Plots, Dates, LinearAlgebra, Random, Statistics, CSV, DataFrames, FixedPointNumbers, ColorTypes, Base.Threads, ImageContrastAdjustment
+using HTTP, Images, Flux, Plots, Dates, LinearAlgebra, Random, Statistics, CSV, DataFrames, FixedPointNumbers, ColorTypes, Base.Threads, ImageContrastAdjustment, JLD2
 using Flux: crossentropy, onecold, onehotbatch, train!, params, ADAM, @epochs
 
 function download_image(url::String)
@@ -27,6 +27,20 @@ function download_and_resize(url, image_size, contrast)
     return image
 end
 
+function get_data(image_size::Int64, contrast::Int64)
+    file_path = "flux/image_datasets/$image_size-px-$contrast.jld2"
+    if isfile(file_path)
+        println("Loading a dataset of images sized $image_size x $image_size with a contrast of $contrast")
+        @load file_path X_train X_test y_train y_test
+        return X_train, X_test, y_train, y_test
+    else
+        X_train, X_test, y_train, y_test = load_data(image_size, contrast)
+        @save file_path X_train X_test y_train y_test
+        println("Dataset images sized $image_size x $image_size with a contrast of $contrast successfully created")
+        return X_train, X_test, y_train, y_test
+    end
+end
+
 function load_data(image_size::Int64, contrast::Int64)
     print("Reading dataframe...\n")
     df = CSV.read("flux/labeled_images.csv", DataFrame)
@@ -41,8 +55,8 @@ function load_data(image_size::Int64, contrast::Int64)
     shuffled_labels = labels[indices]
 
     #size to split
-    size_train = round(Int, length(shuffled_labels) * 0.90)
-    size_test = round(Int, length(shuffled_labels) * 0.10)
+    size_train = round(Int, length(shuffled_labels) * 0.80)
+    size_test = round(Int, length(shuffled_labels) * 0.20)
 
     train_urls = shuffled_urls[1:size_train]
     train_labels = shuffled_labels[1:size_train]

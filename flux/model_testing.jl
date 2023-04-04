@@ -1,11 +1,12 @@
 using JLD2, Flux, Statistics
 using Flux: onecold
 
-@load "flux/image_datasets/224-px-50.jld2" X_train X_test y_train y_test
-
-@load "flux/models/model_2023-04-03T09:47:45.050.jld2" model
-
 image_size = 224
+contrast = 10
+
+@load "flux/image_datasets/$image_size-px-$contrast.jld2" X_train X_test y_train y_test
+
+@load "flux/models/model_$image_size-px-$contrast.jld2" model
 
 X_test = reshape(X_test, image_size, image_size, 1, :)
 

@@ -3,22 +3,13 @@ include("beep.jl")
 using Flux.Optimise, JLD2
 using Flux: flatten
 
-image_size = 224
-contrast = 50
+learning_rate = 0.000001
+epochs = 50
 
-function get_data(image_size::Int64, contrast::Int64)
-  file_path = "flux/image_datasets/$image_size-px-$contrast.jld2"
-  if isfile(file_path)
-    println("Loading a dataset of images sized $image_size x $image_size with a contrast of $contrast")
-    @load file_path X_train X_test y_train y_test
-    return X_train, X_test, y_train, y_test
-  else
-    X_train, X_test, y_train, y_test = load_data(image_size, contrast)
-    @save file_path X_train X_test y_train y_test
-    println("Dataset images sized $image_size x $image_size with a contrast of $contrast successfully created")
-    return X_train, X_test, y_train, y_test
-  end
-end
+image_size = 224
+contrast = 10
+
+download_and_resize("https://storage.labelbox.com/cl8adr7vlae2807xb1fnc5x7e%2Fdc79ed98-2639-fff2-352c-4dab1942540e-PginABK7_288.h5.png?Expires=1681179638094&KeyName=labelbox-assets-key-3&Signature=eaoyiYxVl3_c_3PVRj_U5qeleS0", image_size, contrast)
 
 X_train, X_test, y_train, y_test = @beep get_data(image_size, contrast)
 
@@ -38,9 +29,8 @@ function build_cnn(; imgsize=(image_size, image_size, 1), nclasses=2)
     Conv((5, 5), 6 => 16, relu),
     MaxPool((2, 2)),
     Flux.flatten,
-    Dense(prod(out_conv_size), 120, relu),
-    Dense(120, 84, relu),
-    Dense(84, nclasses),
+    Dense(prod(out_conv_size), 64, relu),
+    Dense(64, nclasses),
     softmax
   )
 end
@@ -49,7 +39,6 @@ model = build_cnn()
 
 #define loss function, params, optimizer, and live plot
 loss(x, y) = crossentropy(model(x), y)
-learning_rate = 0.000001
 ps = params(model)
 opt = ADAM(learning_rate)
 loss_plot = Plots.plot([], [], xlabel="Epochs", ylabel="Loss", title="Live Loss Plot", legend=false, color=:blue, linewidth=2)
@@ -59,7 +48,6 @@ println("Let the training begin!\n")
 
 #train model
 loss_history = []
-epochs = 2
 start_time = now()
 @beep for epoch in 1:epochs
   #train with optimized learning rate
@@ -75,7 +63,7 @@ start_time = now()
   display(loss_plot)
 end
 
-@save "flux/models/model_$start_time.jld2" model
+@save "flux/models/model_$image_size-px-$contrast.jld2" model
 
 end_time = now()
 elapsed_time = end_time - start_time
